@@ -1,0 +1,13 @@
+{
+  "name": "@debugrecorder/debugrecorder-ui",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "monaco-editor": "^0.52.2",
+    "monaco-editor-webpack-plugin": "^7.1.0",
+    "react-router-dom": "^7.5.2"
+  },
+  "devDependencies": {
+    "@types/react-router-dom": "^5.3.3"
+  }
+}
