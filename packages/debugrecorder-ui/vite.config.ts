@@ -26,4 +26,7 @@ export default defineConfig(() => ({
       transformMixedEsModules: true,
     },
   },
+  optimizeDeps: {
+    include: ['monaco-editor/esm/vs/editor/editor.main.js'],
+  },
 }));
