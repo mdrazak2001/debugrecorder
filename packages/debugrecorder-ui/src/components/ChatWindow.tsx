@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { LLMService, LLMProvider } from '../services/llm/llmService';
 
 interface Message {
   text: string;
@@ -6,9 +7,19 @@ interface Message {
   timestamp: Date;
 }
 
-export const ChatWindow: React.FC = () => {
+interface ChatWindowProps {
+  currentFile: string;
+  currentLine: number;
+  variables: Record<string, string>;
+}
+
+export const ChatWindow: React.FC<ChatWindowProps> = ({ currentFile, currentLine, variables }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
+  const [isConfigured, setIsConfigured] = useState(false);
+  const [provider, setProvider] = useState<LLMProvider>("gpt-3.5-turbo");
+  const [apiKey, setApiKey] = useState('');
+  const llmServiceRef = useRef<LLMService | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -19,9 +30,15 @@ export const ChatWindow: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleConfig = () => {
+    if (!apiKey) return;
+    llmServiceRef.current = new LLMService({ provider, apiKey });
+    setIsConfigured(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || !llmServiceRef.current) return;
 
     const newMessage: Message = {
       text: inputText,
@@ -29,19 +46,79 @@ export const ChatWindow: React.FC = () => {
       timestamp: new Date()
     };
 
-    setMessages([...messages, newMessage]);
+    setMessages(prev => [...prev, newMessage]);
     setInputText('');
 
-    // TODO: Here you'll integrate your LLM response logic
+    try {
+      const response = await llmServiceRef.current.getResponse(inputText, {
+        currentFile,
+        currentLine,
+        variables
+      });
+
+      const aiMessage: Message = {
+        text: response as string,
+        isUser: false,
+        timestamp: new Date()
+      };
+
+      setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      const errorMessage: Message = {
+        text: "Sorry, there was an error generating the response. Please try again.",
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    }
   };
 
-  return (
-    <div className="chat-window h-full flex flex-col text-white-100">
+  return !isConfigured ? (
+    <div className="chat-window h-full flex flex-col chat-text">
       <div className="chat-header p-2 border-b border-gray-700 bg-[#252526] flex items-center justify-between">
-        <h2 className="text-sm font-medium chat-text">AI Assistant</h2>
+        <h2 className="text-sm font-medium">Configure AI Assistant</h2>
+      </div>
+      <div className="flex-1 p-4 space-y-4 bg-[#1e1e1e]">
+        <div className="space-y-2">
+          <label className="block">
+            Model:
+            <select
+              value={provider}
+              onChange={(e) => setProvider(e.target.value as LLMProvider)}
+              className="ml-2 p-1 rounded bg-[#3C3C3C] border border-gray-700"
+            >
+              <option value="gpt-3.5-turbo">OpenAI GPT-3.5 Turbo</option>
+              <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
+              <option value="gemma-7b-it">Google Gemma 7B IT</option>
+            </select>
+          </label>
+          <br></br>
+          <br></br>
+          <label className="block">
+            API Key:
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              className="ml-2 p-1 rounded bg-[#3C3C3C] border border-gray-700 w-64"
+            />
+          </label>
+          <button
+            onClick={handleConfig}
+            className="px-4 py-2 bg-[#0E639C] text-white rounded hover:bg-[#1177bb]"
+          >
+            Configure
+          </button>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div className="chat-window h-full flex flex-col chat-text">
+      <div className="chat-header p-2 border-b border-gray-700 bg-[#252526] flex items-center justify-between">
+        <h2 className="text-sm font-medium">AI Assistant ({provider})</h2>
       </div>
 
-      <div className="chat-messages flex-1 overflow-y-auto p-4 space-y-4 bg-[#1e1e1e] chat-text">
+      <div className="chat-messages flex-1 overflow-y-auto p-4 space-y-4 bg-[#1e1e1e]">
         {messages.map((message, index) => (
           <div
             key={index}
@@ -72,7 +149,7 @@ export const ChatWindow: React.FC = () => {
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Ask a question..."
+            placeholder="Ask about the current debugging state..."
             className="flex-1 p-2 rounded bg-[#3C3C3C] border border-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:border-[#0E639C]"
           />
           <button

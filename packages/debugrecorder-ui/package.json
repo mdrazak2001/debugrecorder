@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@langchain/google-genai": "^0.2.5",
+    "@langchain/openai": "^0.5.7",
+    "langchain": "^0.3.24",
     "monaco-editor": "^0.52.2",
     "monaco-editor-webpack-plugin": "^7.1.0",
     "react-router-dom": "^7.5.2"

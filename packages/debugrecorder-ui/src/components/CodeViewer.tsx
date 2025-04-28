@@ -129,10 +129,15 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({ codeLines, currentLine, 
         style={{
           height: '100%',
           borderLeft: '1px solid #333',
-          backgroundColor: '#1e1e1e'
+          backgroundColor: '#1e1e1e',
+          display: showChat ? 'block' : 'none'
         }}
       >
-        <ChatWindow />
+        <ChatWindow 
+          currentFile={codeLines.join('\n')}
+          currentLine={currentLine}
+          variables={variables}
+        />
       </div>
     </div>
   );
