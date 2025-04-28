@@ -31,3 +31,82 @@
   font-family: 'Consolas', 'Courier New', monospace !important;
   font-size: 13px !important;
 }
+
+/* Global styles */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tailwind-like utility classes */
+.h-full {
+  height: 100%;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.w-96 {
+  width: 24rem;
+}
+
+.border-l {
+  border-left-width: 1px;
+}
+
+.border-gray-200 {
+  border-color: rgb(229 231 235);
+}
+
+.bg-white {
+  background-color: white;
+}
+
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.text-lg {
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.border-t {
+  border-top-width: 1px;
+}
+
+.border-b {
+  border-bottom-width: 1px;
+}
+
+
+.chat-text {
+  color: #d4d4d4;
+}

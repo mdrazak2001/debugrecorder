@@ -1,7 +1,8 @@
 // packages/debugrecorder-ui/src/components/CodeViewer.tsx
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as monaco from 'monaco-editor';
 import { editor } from 'monaco-editor';
+import { ChatWindow } from './ChatWindow';
 
 // Import Monaco Editor styles
 import 'monaco-editor/min/vs/editor/editor.main.css';
@@ -13,72 +14,126 @@ interface CodeViewerProps {
 }
 
 export const CodeViewer: React.FC<CodeViewerProps> = ({ codeLines, currentLine, variables }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
   const editorInstance = useRef<editor.IStandaloneCodeEditor | null>(null);
 
+  const [showChat, setShowChat] = useState(true);
+
   useEffect(() => {
-    if (editorRef.current) {
-      // Initialize Monaco Editor
-      editorInstance.current = monaco.editor.create(editorRef.current, {
-        value: codeLines.join('\n'),
-        language: 'python',
-        theme: 'vs-dark',
-        readOnly: true,
-        minimap: { enabled: true },
-        lineNumbers: 'on',
-        scrollBeyondLastLine: false,
-        automaticLayout: true,
-        glyphMargin: true,
-        lineDecorationsWidth: 0,
-        lineNumbersMinChars: 3,
-      });
+    if (!containerRef.current || !editorRef.current || !chatRef.current) return;
 
-      // Add hover provider for variables
-      monaco.languages.registerHoverProvider('python', {
-        provideHover: (model, position) => {
-          const word = model.getWordAtPosition(position);
-          if (!word) return null;
+    // Create the editor
+    editorInstance.current = monaco.editor.create(editorRef.current, {
+      value: codeLines.join('\n'),
+      language: 'python',
+      theme: 'vs-dark',
+      readOnly: true,
+      minimap: { enabled: true },
+      lineNumbers: 'on',
+      scrollBeyondLastLine: false,
+      automaticLayout: true,
+      glyphMargin: true,
+      lineDecorationsWidth: 0,
+      lineNumbersMinChars: 3,
+    });
 
-          const variableName = word.word;
-          if (variables[variableName]) {
-            return {
-              contents: [
-                { value: `**${variableName}** = ${variables[variableName]}` }
-              ]
-            };
-          }
-          return null;
+    // Add hover provider for variables
+    monaco.languages.registerHoverProvider('python', {
+      provideHover: (model, position) => {
+        const word = model.getWordAtPosition(position);
+        if (!word) return null;
+
+        const variableName = word.word;
+        if (variables[variableName]) {
+          return {
+            contents: [
+              { value: `**${variableName}** = ${variables[variableName]}` }
+            ]
+          };
         }
-      });
+        return null;
+      }
+    });
 
-      // Highlight current line
-      editorInstance.current.deltaDecorations([], [
-        {
-          range: new monaco.Range(currentLine, 1, currentLine, 1),
-          options: {
-            isWholeLine: true,
-            className: 'current-line-highlight',
-            glyphMarginClassName: 'current-line-glyph'
-          }
+    // Highlight current line
+    editorInstance.current.deltaDecorations([], [
+      {
+        range: new monaco.Range(currentLine, 1, currentLine, 1),
+        options: {
+          isWholeLine: true,
+          className: 'current-line-highlight',
+          glyphMarginClassName: 'current-line-glyph'
         }
-      ]);
-    }
+      }
+    ]);
+
+    // Add chat toggle action to editor
+    editorInstance.current.addAction({
+      id: 'toggle-chat',
+      label: 'Toggle Chat',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyI],
+      run: () => setShowChat(prev => !prev)
+    });
+
+    // Handle editor layout
+    const updateLayout = () => {
+      if (!containerRef.current || !editorRef.current || !chatRef.current || !editorInstance.current) return;
+      
+      const containerWidth = containerRef.current.offsetWidth;
+      const chatWidth = showChat ? 400 : 0;
+      const editorWidth = containerWidth - chatWidth;
+
+      editorRef.current.style.width = `${editorWidth}px`;
+      chatRef.current.style.width = `${chatWidth}px`;
+      chatRef.current.style.display = showChat ? 'block' : 'none';
+
+      editorInstance.current.layout();
+    };
+
+    updateLayout();
+    window.addEventListener('resize', updateLayout);
 
     return () => {
+      window.removeEventListener('resize', updateLayout);
       if (editorInstance.current) {
         editorInstance.current.dispose();
       }
     };
-  }, [codeLines, currentLine, variables]);
+  }, [codeLines, currentLine, variables, showChat]);
 
   return (
     <div 
-      ref={editorRef} 
+      ref={containerRef} 
+      className="editor-container" 
       style={{ 
-        height: '500px', 
+        display: 'flex',
+        height: '500px',
+        position: 'relative',
         border: '1px solid #333',
-        borderRadius: '4px'
-      }} 
-    />
+        borderRadius: '4px',
+        overflow: 'hidden'
+      }}
+    >
+      <div 
+        ref={editorRef}
+        style={{ 
+          height: '100%',
+          flexGrow: 1
+        }} 
+      />
+      <div 
+        ref={chatRef}
+        className="chat-panel"
+        style={{
+          height: '100%',
+          borderLeft: '1px solid #333',
+          backgroundColor: '#1e1e1e'
+        }}
+      >
+        <ChatWindow />
+      </div>
+    </div>
   );
 };
