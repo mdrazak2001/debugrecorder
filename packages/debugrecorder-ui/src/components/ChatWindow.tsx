@@ -11,9 +11,15 @@ interface ChatWindowProps {
   currentFile: string;
   currentLine: number;
   variables: Record<string, string>;
+  events: Array<{
+    ts: number;
+    filename: string;
+    line_no: number;
+    locals: Record<string, string>;
+  }>;
 }
 
-export const ChatWindow: React.FC<ChatWindowProps> = ({ currentFile, currentLine, variables }) => {
+export const ChatWindow: React.FC<ChatWindowProps> = ({ currentFile, currentLine, variables, events }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState('');
   const [isConfigured, setIsConfigured] = useState(false);
@@ -53,7 +59,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ currentFile, currentLine
       const response = await llmServiceRef.current.getResponse(inputText, {
         currentFile,
         currentLine,
-        variables
+        variables,
+        executionHistory: events
       });
 
       const aiMessage: Message = {

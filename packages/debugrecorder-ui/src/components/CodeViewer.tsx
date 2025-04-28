@@ -11,9 +11,15 @@ interface CodeViewerProps {
   codeLines: string[];
   currentLine: number;
   variables: Record<string, string>;
+  events: Array<{
+    ts: number;
+    filename: string;
+    line_no: number;
+    locals: Record<string, string>;
+  }>;
 }
 
-export const CodeViewer: React.FC<CodeViewerProps> = ({ codeLines, currentLine, variables }) => {
+export const CodeViewer: React.FC<CodeViewerProps> = ({ codeLines, currentLine, variables, events }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
@@ -137,6 +143,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({ codeLines, currentLine, 
           currentFile={codeLines.join('\n')}
           currentLine={currentLine}
           variables={variables}
+          events={events}
         />
       </div>
     </div>

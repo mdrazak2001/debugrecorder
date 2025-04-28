@@ -1,18 +1,3 @@
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import SessionPlayer from '../pages/SessionPlayer';
-
-// function App() {
-//   return (
-//     <Router>
-//       <Routes>
-//         <Route path="/" element={<SessionPlayer />} />
-//       </Routes>
-//     </Router>
-//   );
-// }
-
-// export default App;
-
 // packages/debugrecorder-ui/src/App.tsx
 // App.tsx
 import React, { useState } from "react";
@@ -71,6 +56,7 @@ function App() {
         codeLines={codeLines}
         currentLine={currentEvent.line_no}
         variables={currentEvent.locals}
+        events={events}
       />
     </div>
   );
