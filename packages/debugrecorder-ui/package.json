@@ -5,12 +5,22 @@
   "dependencies": {
     "@langchain/google-genai": "^0.2.5",
     "@langchain/openai": "^0.5.7",
+    "@tailwindcss/vite": "^4.1.4",
     "langchain": "^0.3.24",
     "monaco-editor": "^0.52.2",
     "monaco-editor-webpack-plugin": "^7.1.0",
-    "react-router-dom": "^7.5.2"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.5.2",
+    "shadcn-dropzone": "^0.2.1"
   },
   "devDependencies": {
-    "@types/react-router-dom": "^5.3.3"
+    "@tailwindcss/postcss": "^4.1.4",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@types/react-router-dom": "^5.3.3",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4"
   }
 }

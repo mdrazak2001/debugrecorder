@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import Dropzone, { DropzoneState } from 'shadcn-dropzone';
 
 interface FileUploadProps {
   onFilesSelected: (pythonFile: File, jsonlFile: File) => void;
@@ -7,78 +8,86 @@ interface FileUploadProps {
 export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected }) => {
   const [pythonFile, setPythonFile] = useState<File | null>(null);
   const [jsonlFile, setJsonlFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handlePythonFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.name.endsWith('.py')) {
-      setPythonFile(file);
-    } else {
-      alert('Please select a Python file (.py)');
-    }
-  };
+  const handleDrop = useCallback((acceptedFiles: File[]) => {
+    setError(null);
+    
+    // Process dropped files
+    acceptedFiles.forEach(file => {
+      if (file.name.endsWith('.py')) {
+        setPythonFile(file);
+      } else if (file.name.endsWith('.jsonl')) {
+        setJsonlFile(file);
+      }
+    });
+  }, []);
 
-  const handleJsonlFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.name.endsWith('.jsonl')) {
-      setJsonlFile(file);
-    } else {
-      alert('Please select a JSONL file (.jsonl)');
-    }
-  };
-
-  const handleSubmit = () => {
+  // Auto-submit when both files are present
+  React.useEffect(() => {
     if (pythonFile && jsonlFile) {
       onFilesSelected(pythonFile, jsonlFile);
-    } else {
-      alert('Please select both a Python file and a JSONL file');
     }
-  };
+  }, [pythonFile, jsonlFile, onFilesSelected]);
 
   return (
-    <div className="p-4 space-y-4">
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
-          Python Source File
-        </label>
-        <input
-          type="file"
-          accept=".py"
-          onChange={handlePythonFileChange}
-          className="block w-full text-sm text-gray-500
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-md file:border-0
-            file:text-sm file:font-semibold
-            file:bg-blue-50 file:text-blue-700
-            hover:file:bg-blue-100"
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
-          Debug Session File (JSONL)
-        </label>
-        <input
-          type="file"
-          accept=".jsonl"
-          onChange={handleJsonlFileChange}
-          className="block w-full text-sm text-gray-500
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-md file:border-0
-            file:text-sm file:font-semibold
-            file:bg-blue-50 file:text-blue-700
-            hover:file:bg-blue-100"
-        />
-      </div>
-
-      <button
-        onClick={handleSubmit}
-        disabled={!pythonFile || !jsonlFile}
-        className="px-4 py-2 bg-blue-600 text-white rounded-md
-          hover:bg-blue-700 disabled:bg-gray-400
-          disabled:cursor-not-allowed"
+    <div className="max-w-xl mx-auto">
+      <Dropzone
+        onDrop={handleDrop}
+        accept={{
+          'text/x-python': ['.py'],
+          'application/jsonl': ['.jsonl'],
+          'text/plain': ['.py', '.jsonl']
+        }}
+        maxFiles={2}
       >
-        Load Files
-      </button>
+        {(dropzone: DropzoneState) => (
+          <div 
+            className={`custom-dropzone p-8 min-h-[300px] min-w-[300px] text-center flex flex-col justify-center ${
+              dropzone.isDragAccept ? 'accept' : ''
+            }`}
+          >
+            {dropzone.isDragAccept ? (
+              <div className="text-lg font-medium text-blue-600">Drop your files here!</div>
+            ) : (
+              <div className="space-y-4">
+                <div className="text-4xl">📁</div>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="text-lg font-medium">
+                    Drag & drop your files here
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    or click to select files
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="text-sm space-y-2 mt-4">
+              <div className="flex items-center justify-center gap-2">
+                <span className={pythonFile ? 'font-medium text-green-600' : 'font-medium text-gray-400'}>
+                  {pythonFile ? '✓ Python file selected' : '• Python file (.py)'}
+                </span>
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <span className={jsonlFile ? 'font-medium text-green-600' : 'font-medium text-gray-400'}>
+                  {jsonlFile ? '✓ Debug data selected' : '• Debug data (.jsonl)'}
+                </span>
+              </div>
+            </div>
+
+            {error && (
+              <div className="text-sm text-red-500 font-medium mt-2">
+                {error}
+              </div>
+            )}
+          </div>
+        )}
+      </Dropzone>
+      <br></br>
+      <div className="text-sm text-gray-500 text-center mt-2">
+        Upload both a Python source file (.py) and a debug session file (.jsonl)
+      </div>
     </div>
   );
-}; 
+};
