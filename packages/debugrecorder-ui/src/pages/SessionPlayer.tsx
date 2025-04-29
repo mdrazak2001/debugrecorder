@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FileUpload } from '../components/FileUpload';
 import { CodeViewer } from '../components/CodeViewer';
+import { Timeline } from '../components/Timeline';
 
 type DebugFrame = {
   ts: number;
@@ -64,6 +65,15 @@ export default function SessionPlayer() {
               Load Different Files
             </button>
           </div>
+
+          { currentFrame && (
+            <Timeline 
+              events={frames}
+              currentIndex={currentFrameIndex}
+              onSelect={setCurrentFrameIndex}
+            />
+          )}
+  
 
           {currentFrame && (
             <CodeViewer
