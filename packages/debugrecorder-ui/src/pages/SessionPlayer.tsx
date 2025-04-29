@@ -38,8 +38,8 @@ export default function SessionPlayer() {
   const currentFrame = frames[currentFrameIndex];
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Debug Session Player</h1>
+    <div className="flex justify-center items-center flex-col gap-4 w-screen h-screen">
+      <h1 className="text-xl font-bold mb-4 flex items-center flex-col gap-1">Debug Session Player</h1>
       
       {showFileUpload ? (
         <FileUpload onFilesSelected={handleFilesSelected} />

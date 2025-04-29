@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import Dropzone, { DropzoneState } from 'shadcn-dropzone';
+import { Upload, X } from "lucide-react";
 
 interface FileUploadProps {
   onFilesSelected: (pythonFile: File, jsonlFile: File) => void;
@@ -50,17 +51,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected }) => {
             {dropzone.isDragAccept ? (
               <div className="text-lg font-medium text-blue-600">Drop your files here!</div>
             ) : (
-              <div className="space-y-4">
-                <div className="text-4xl">📁</div>
-                <div className="flex flex-col items-center gap-2">
-                  <div className="text-lg font-medium">
-                    Drag & drop your files here
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    or click to select files
-                  </div>
-                </div>
+              <div className="flex flex-col items-center gap-1">
+                  <Upload className="size-10 text-muted-foreground" />
+                <p className="font-medium text-sm">Drag & drop files here</p>
+                <p className="text-muted-foreground text-xs">
+                  Or click to browse (max 2 files)
+                </p>
               </div>
+              
             )}
 
             <div className="text-sm space-y-2 mt-4">
