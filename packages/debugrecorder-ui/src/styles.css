@@ -84,3 +84,19 @@ html, body, #root {
 .dark-mode {
   background-color: rgb(30, 30, 30);
 }
+
+.play-button {
+  margin-top:20px;
+  margin-left: 47%;
+  margin-bottom: 10px;
+}
+
+.jump-to-button {
+  margin-left: 44%;
+  margin-bottom: 13px;
+}
+
+.input-field {
+  margin-left: 2px;
+  margin-right: 2px;
+}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { FileUpload } from '../components/FileUpload';
 import { CodeViewer } from '../components/CodeViewer';
 import { Timeline } from '../components/Timeline';
+import { StepBack, StepForward } from 'lucide-react';
 
 type DebugFrame = {
   ts: number;
@@ -18,11 +19,9 @@ export default function SessionPlayer() {
 
   const handleFilesSelected = async (pythonFile: File, jsonlFile: File) => {
     try {
-      // Read Python file
       const pythonText = await pythonFile.text();
       setCodeLines(pythonText.split('\n'));
 
-      // Read JSONL file
       const jsonlText = await jsonlFile.text();
       const lines = jsonlText.trim().split('\n');
       const parsed = lines.map(line => JSON.parse(line));
@@ -45,36 +44,9 @@ export default function SessionPlayer() {
         <FileUpload onFilesSelected={handleFilesSelected} />
       ) : (
         <div className="space-y-4">
-          <div className="flex space-x-4">
-            <button 
-              onClick={() => setCurrentFrameIndex(i => Math.max(0, i - 1))}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              ◀️ Prev
-            </button>
-            <button 
-              onClick={() => setCurrentFrameIndex(i => Math.min(frames.length - 1, i + 1))}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            >
-              Next ▶️
-            </button>
-            <button 
-              onClick={() => setShowFileUpload(true)}
-              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
-            >
-              Load Different Files
-            </button>
-          </div>
+        
 
-          { currentFrame && (
-            <Timeline 
-              events={frames}
-              currentIndex={currentFrameIndex}
-              onSelect={setCurrentFrameIndex}
-            />
-          )}
-  
-
+          {/* Code + variables view */}
           {currentFrame && (
             <CodeViewer
               codeLines={codeLines}
@@ -83,6 +55,43 @@ export default function SessionPlayer() {
               events={frames}
             />
           )}
+
+          {/* Control bar with centered back/forward and right-aligned load button */}
+          <div className="flex">
+            {/* <div className="w-200 flex-1 "></div> */}
+            <div className="play-button">
+              <button
+                onClick={() => setCurrentFrameIndex(i => Math.max(0, i - 1))}
+                className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                <StepBack />
+              </button>
+              <button
+                onClick={() => setCurrentFrameIndex(i => Math.min(frames.length - 1, i + 1))}
+                className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                <StepForward />
+              </button>
+            </div>
+            {/* <div className="flex-1" /> */}
+
+            <button
+              onClick={() => setShowFileUpload(true)}
+              className="ml-auto p-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
+            >
+              Load Different Files
+            </button>
+            <div />
+          </div>
+
+          {currentFrame && (
+            <Timeline
+              events={frames}
+              currentIndex={currentFrameIndex}
+              onSelect={setCurrentFrameIndex}
+            />
+          )}
+
         </div>
       )}
     </div>

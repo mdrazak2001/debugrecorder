@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { LLMService, LLMProvider } from '../services/llm/llmService';
+import { Send } from 'lucide-react';
 
 interface Message {
   text: string;
@@ -87,12 +88,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ currentFile, currentLine
       </div>
       <div className="flex-1 p-4 space-y-4 bg-[#1e1e1e]">
         <div className="space-y-2">
+          <br></br>
           <label className="block">
             Model:
             <select
               value={provider}
               onChange={(e) => setProvider(e.target.value as LLMProvider)}
-              className="ml-2 p-1 rounded bg-[#3C3C3C] border border-gray-700"
+              className="ml-2 p-1"
             >
               <option value="gpt-3.5-turbo">OpenAI GPT-3.5 Turbo</option>
               <option value="gemini-2.0-flash">Google Gemini 2.0 Flash</option>
@@ -110,9 +112,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ currentFile, currentLine
               className="ml-2 p-1 rounded bg-[#3C3C3C] border border-gray-700 w-64"
             />
           </label>
+          <br></br>
           <button
             onClick={handleConfig}
-            className="px-4 py-2 bg-[#0E639C] text-white rounded hover:bg-[#1177bb]"
+            className="px-4 py-2 bg-[#0E639C] text-white rounded hover:bg-[#1177bb] chat-text"
           >
             Configure
           </button>
@@ -152,19 +155,19 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ currentFile, currentLine
 
       <form onSubmit={handleSubmit} className="chat-input p-3 border-t border-gray-700 bg-[#252526]">
         <div className="flex gap-2">
-          <input
-            type="text"
+          <textarea
+            id="large-input"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Ask about the current debugging state..."
-            className="flex-1 p-2 rounded bg-[#3C3C3C] border border-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:border-[#0E639C]"
+            className="chat-text flex-1 p-2 rounded bg-[#3C3C3C] border border-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:border-[#0E639C]"
           />
           <button
             type="submit"
             disabled={!inputText.trim()}
-            className="px-4 py-2 bg-[#0E639C] text-white rounded hover:bg-[#1177bb] focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+            
           >
-            Send
+            <Send className="w-4 h-4" />
           </button>
         </div>
       </form>
