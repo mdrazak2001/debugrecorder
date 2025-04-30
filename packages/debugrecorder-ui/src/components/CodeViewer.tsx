@@ -75,6 +75,9 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({ codeLines, currentLine, 
       }
     ]);
 
+    // Keep current line in view
+    editorInstance.current.revealLineInCenter(currentLine);
+
     // Add chat toggle action to editor
     editorInstance.current.addAction({
       id: 'toggle-chat',
