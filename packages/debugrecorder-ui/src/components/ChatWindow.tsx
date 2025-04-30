@@ -109,7 +109,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ currentFile, currentLine
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
-              className="ml-2 p-1 rounded bg-[#3C3C3C] border border-gray-700 w-64"
+              className="chat-text ml-2 p-1 rounded bg-[#3C3C3C] border border-gray-700 w-64"
             />
           </label>
           <br></br>
@@ -159,6 +159,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ currentFile, currentLine
             id="large-input"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmit(e);
+              }
+            }}
             placeholder="Ask about the current debugging state..."
             className="chat-text flex-1 p-2 rounded bg-[#3C3C3C] border border-gray-700 text-gray-100 placeholder-gray-400 focus:outline-none focus:border-[#0E639C]"
           />
