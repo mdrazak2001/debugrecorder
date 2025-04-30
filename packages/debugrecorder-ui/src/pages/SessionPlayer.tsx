@@ -38,7 +38,7 @@ export default function SessionPlayer() {
   const currentFrame = frames[currentFrameIndex];
 
   return (
-    <div className="flex justify-center items-center flex-col gap-4 w-screen h-screen">
+    <div className="p">
       <h1 className="text-xl font-bold mb-4 flex items-center flex-col gap-1">Debug Session Player</h1>
       
       {showFileUpload ? (
