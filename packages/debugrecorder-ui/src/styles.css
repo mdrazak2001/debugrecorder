@@ -73,9 +73,14 @@ html, body, #root {
 #root {
   display: flex;
   flex-direction: column;
+  background-color: rgb(30, 30, 30);
 }
 
 .chat-text {
-  color: #d4d4d4;
+  color: #ffffff;
 }
 
+
+.dark-mode {
+  background-color: rgb(30, 30, 30);
+}

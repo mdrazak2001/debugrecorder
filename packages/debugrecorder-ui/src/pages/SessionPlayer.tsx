@@ -39,7 +39,7 @@ export default function SessionPlayer() {
 
   return (
     <div className="p">
-      <h1 className="text-xl font-bold mb-4 flex items-center flex-col gap-1">Debug Session Player</h1>
+      <h1 className="text-xl font-bold mb-4 flex items-center flex-col gap-1 chat-text">Debug Session Player</h1>
       
       {showFileUpload ? (
         <FileUpload onFilesSelected={handleFilesSelected} />

@@ -32,7 +32,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelected }) => {
   }, [pythonFile, jsonlFile, onFilesSelected]);
 
   return (
-    <div className="max-w-xl mx-auto">
+    <div className="max-w-xl mx-auto chat-text">
       <Dropzone
         onDrop={handleDrop}
         accept={{

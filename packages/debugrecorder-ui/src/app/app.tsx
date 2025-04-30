@@ -5,7 +5,7 @@ import '../styles.css'; // Make sure to import your CSS file
 
 function App() {
   return (
-    <div className="p-4">
+    <div className="dark-mode">
       <SessionPlayer />
     </div>
   );
