@@ -1,4 +1,3 @@
-// packages/debugrecorder-ui/src/components/CodeViewer.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import * as monaco from 'monaco-editor';
 import { editor } from 'monaco-editor';
@@ -24,6 +23,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({ codeLines, currentLine, 
   const editorRef = useRef<HTMLDivElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
   const editorInstance = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const hoverProvider = useRef<monaco.IDisposable | null>(null);
 
   const [showChat, setShowChat] = useState(true);
 
@@ -44,39 +44,6 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({ codeLines, currentLine, 
       lineDecorationsWidth: 0,
       lineNumbersMinChars: 3,
     });
-
-    // Add hover provider for variables
-    monaco.languages.registerHoverProvider('python', {
-      provideHover: (model, position) => {
-        const word = model.getWordAtPosition(position);
-        if (!word) return null;
-
-        const variableName = word.word;
-        if (variables[variableName]) {
-          return {
-            contents: [
-              { value: `**${variableName}** = ${variables[variableName]}` }
-            ]
-          };
-        }
-        return null;
-      }
-    });
-
-    // Highlight current line
-    editorInstance.current.deltaDecorations([], [
-      {
-        range: new monaco.Range(currentLine, 1, currentLine, 1),
-        options: {
-          isWholeLine: true,
-          className: 'current-line-highlight',
-          glyphMarginClassName: 'current-line-glyph'
-        }
-      }
-    ]);
-
-    // Keep current line in view
-    editorInstance.current.revealLineInCenter(currentLine);
 
     // Add chat toggle action to editor
     editorInstance.current.addAction({
@@ -104,13 +71,68 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({ codeLines, currentLine, 
     updateLayout();
     window.addEventListener('resize', updateLayout);
 
+    editorInstance.current.revealLineInCenter(currentLine);
+
     return () => {
       window.removeEventListener('resize', updateLayout);
       if (editorInstance.current) {
         editorInstance.current.dispose();
       }
     };
-  }, [codeLines, currentLine, variables, showChat]);
+  }, [codeLines, showChat]);
+
+  // Handle variable hover - use a separate effect to properly dispose and recreate
+  useEffect(() => {
+    if (!editorInstance.current) return;
+
+    // Remove previous hover provider if exists
+    if (hoverProvider.current) {
+      hoverProvider.current.dispose();
+      hoverProvider.current = null;
+    }
+
+    // Register new hover provider
+    hoverProvider.current = monaco.languages.registerHoverProvider('python', {
+      provideHover: (model, position) => {
+        const word = model.getWordAtPosition(position);
+        if (!word) return null;
+
+        const variableName = word.word;
+        if (variables[variableName]) {
+          return {
+            contents: [
+              { value: `**${variableName}** = ${variables[variableName]}` }
+            ]
+          };
+        }
+        return null;
+      }
+    });
+
+    editorInstance.current.revealLineInCenter(currentLine);
+
+    // Highlight current line
+    const decorations = editorInstance.current.deltaDecorations([], [
+      {
+        range: new monaco.Range(currentLine, 1, currentLine, 1),
+        options: {
+          isWholeLine: true,
+          className: 'current-line-highlight',
+          glyphMarginClassName: 'current-line-glyph'
+        }
+      }
+    ]);
+
+    // Keep current line in view
+    editorInstance.current.revealLineInCenter(currentLine);
+
+    // Cleanup function to remove decorations
+    return () => {
+      if (editorInstance.current) {
+        editorInstance.current.deltaDecorations(decorations, []);
+      }
+    };
+  }, [currentLine, variables]);
 
   return (
     <div 
