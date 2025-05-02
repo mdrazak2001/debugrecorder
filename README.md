@@ -1,6 +1,14 @@
 # 🐛 Debug Recorder - Time-Travel Vibe Debugging with AI
 
-![test](https://github.com/user-attachments/assets/15b91ec4-538b-429c-9ee7-ba9de1d42362)
+
+
+
+
+https://github.com/user-attachments/assets/bc70aefe-1d84-4622-a9af-470201d358a5
+
+
+
+
 
 **Debug Recorder** is a developer tool that captures the execution of your Python programs step-by-step and allows you to analyze it using a visual interface enhanced with AI debugging insights.
 
