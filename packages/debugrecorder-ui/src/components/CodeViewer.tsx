@@ -45,12 +45,19 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({ codeLines, currentLine, 
       lineNumbersMinChars: 3,
     });
 
+    editorInstance.current.focus();
+
     // Add chat toggle action to editor
-    editorInstance.current.addAction({
+    editorInstance.current!.addAction({
       id: 'toggle-chat',
       label: 'Toggle Chat',
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyI],
-      run: () => setShowChat(prev => !prev)
+      run: () => {
+        // toggle chat
+        setShowChat(prev => !prev);
+        // ensure the editor has focus again
+        setTimeout(() => editorInstance.current?.focus(), 0);
+      }
     });
 
     // Handle editor layout
